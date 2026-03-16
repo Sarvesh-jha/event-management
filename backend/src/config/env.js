@@ -2,7 +2,6 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// Keeping environment access in one place makes later phases easier to scale.
 const env = {
   port: Number(process.env.PORT) || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',

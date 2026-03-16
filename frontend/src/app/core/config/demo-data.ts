@@ -164,18 +164,18 @@ export const PREVIEW_DASHBOARD_SUMMARY: DashboardSummary = {
   featuredEvents: PREVIEW_EVENTS.slice(0, 3),
   recentActivity: [
     {
-      title: 'Registration surge detected',
-      detail: 'Cyber Defense Lab crossed 95% occupancy in the last 12 hours.',
+      title: 'Cyber Defense Lab is almost full',
+      detail: 'Registrations jumped in the last few hours and only a few seats are left.',
       time: '10 minutes ago',
     },
     {
-      title: 'Reminder campaign queued',
-      detail: 'Upcoming reminder emails are scheduled for Innovation Summit attendees.',
+      title: 'Reminder batch prepared',
+      detail: 'Reminder emails are lined up for students attending Innovation Summit 2026.',
       time: '1 hour ago',
     },
     {
-      title: 'Admin review pending',
-      detail: 'Two new events are awaiting final approval from the student affairs office.',
+      title: 'Two draft events need review',
+      detail: 'The events team still needs to approve a couple of new submissions.',
       time: '3 hours ago',
     },
   ],

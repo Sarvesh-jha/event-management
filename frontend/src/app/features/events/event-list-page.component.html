@@ -1,20 +1,20 @@
 <section class="events-hero section-card">
   <div class="events-hero__copy">
-    <span class="eyebrow">Campus pulse</span>
-    <h1 class="hero-title">Discover <em>remarkable</em> student experiences.</h1>
+    <span class="eyebrow">Campus board</span>
+    <h1 class="hero-title">Find what is happening on <em>campus this week</em>.</h1>
     <p>
-      Explore workshops, showcases, forums, and student-led gatherings across campus. Register
-      early, save your spot, and keep everything in one place.
+      Browse club events, workshops, forums, and department sessions in one place. Register early,
+      keep your pass handy, and avoid the usual last-minute confusion.
     </p>
 
     <div class="events-hero__actions">
       @if (isAuthenticated() && !isAdmin()) {
-        <a class="primary-button" routerLink="/my-registrations">Open my registrations</a>
+        <a class="primary-button" routerLink="/my-registrations">See my passes</a>
       } @else {
         <a class="primary-button" routerLink="/register">Create student account</a>
       }
       <a class="secondary-button" [routerLink]="isAdmin() ? '/admin' : '/login'">
-        {{ isAdmin() ? 'Open admin dashboard' : 'Admin sign in' }}
+        {{ isAdmin() ? 'Open admin view' : 'Admin sign in' }}
       </a>
     </div>
   </div>
@@ -37,7 +37,7 @@
 
 @if (isPreviewMode()) {
   <p class="status-message status-message--warning">
-    Preview data is currently active because the live event endpoints are not available yet.
+    Showing sample events because the live API could not be reached.
   </p>
 }
 
@@ -69,7 +69,7 @@
 @if (spotlightEvent(); as spotlight) {
   <section class="spotlight section-card">
     <div class="spotlight__copy">
-      <span class="eyebrow">Spotlight event</span>
+      <span class="eyebrow">Picked for this week</span>
       <h2>{{ spotlight.title }}</h2>
       <p>{{ spotlight.description }}</p>
 
@@ -90,10 +90,10 @@
 
 <section class="events-grid">
   @if (loading()) {
-    <article class="loading-card section-card">Loading campus events...</article>
+    <article class="loading-card section-card">Loading events...</article>
   } @else if (!filteredEvents().length) {
     <article class="loading-card section-card">
-      No events matched your filters. Try a different category or search term.
+      No events matched that search. Try another keyword or category.
     </article>
   } @else {
     @for (event of filteredEvents(); track event.id) {

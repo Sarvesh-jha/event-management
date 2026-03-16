@@ -7,25 +7,25 @@
       <span class="brand__crest">SC</span>
       <span class="brand__copy">
         <strong>{{ appName }}</strong>
-        <small>Discover, register, and manage campus moments</small>
+        <small>One place for campus events</small>
       </span>
     </a>
 
     <nav class="topbar__nav">
-      <a routerLink="/events" routerLinkActive="is-active">Explore Events</a>
+      <a routerLink="/events" routerLinkActive="is-active">Events</a>
       @if (isStudent()) {
-        <a routerLink="/my-registrations" routerLinkActive="is-active">My Registrations</a>
+        <a routerLink="/my-registrations" routerLinkActive="is-active">My Passes</a>
       }
-      <a routerLink="/register" routerLinkActive="is-active">Student Sign Up</a>
+      <a routerLink="/register" routerLinkActive="is-active">Create Account</a>
       <a routerLink="/login" routerLinkActive="is-active">Login</a>
       @if (isAdmin()) {
-        <a routerLink="/admin" routerLinkActive="is-active">Admin Dashboard</a>
+        <a routerLink="/admin" routerLinkActive="is-active">Admin</a>
       }
     </nav>
 
     <div class="topbar__actions">
       @if (isPreviewMode()) {
-        <span class="pill pill--preview">Preview mode</span>
+        <span class="pill pill--preview">Sample data</span>
       }
 
       @if (isAuthenticated()) {
@@ -35,7 +35,7 @@
           </span>
           <div>
             <strong>{{ welcomeLabel() }}</strong>
-            <small>{{ isAdmin() ? 'Administrator' : 'Student account' }}</small>
+            <small>{{ isAdmin() ? 'Events team' : 'Student' }}</small>
           </div>
         </div>
 

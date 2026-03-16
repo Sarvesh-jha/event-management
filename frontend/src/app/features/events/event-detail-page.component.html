@@ -49,7 +49,7 @@
 
   @if (isPreviewMode()) {
     <p class="status-message status-message--warning">
-      Preview data is active for this event while the live endpoint is unavailable.
+      Showing sample event details because the live API is unavailable right now.
     </p>
   }
 
@@ -75,12 +75,12 @@
 
     <aside class="registration-card section-card">
       <div class="registration-card__header">
-        <h2>Register for this event</h2>
+        <h2>Reserve your spot</h2>
         <p>
           @if (isAuthenticated()) {
-            You are signing up as {{ currentUser()?.fullName }}.
+            You are registering as {{ currentUser()?.fullName }}.
           } @else {
-            Sign in with a student account to confirm your seat.
+            Sign in with a student account to save your seat.
           }
         </p>
       </div>
@@ -89,7 +89,7 @@
         <div class="status-message status-message--success">
           {{
             activeRegistration.message ??
-              'Your registration is active and ready for check-in.'
+              'You are registered and your check-in pass is ready.'
           }}
         </div>
 
@@ -114,7 +114,7 @@
           </div>
 
           <small>
-            {{ activeRegistration.checkedIn ? 'Attendance recorded.' : 'Show this QR code at event entry.' }}
+            {{ activeRegistration.checkedIn ? 'Attendance has been recorded.' : 'Show this QR code at the entry desk.' }}
           </small>
         </div>
 
@@ -139,7 +139,7 @@
           <span>Note for organizers</span>
           <textarea
             rows="5"
-            placeholder="Accessibility needs, interest areas, or team details"
+            placeholder="Accessibility notes, teammate names, or anything the organizer should know"
             [value]="note()"
             (input)="updateNote($any($event.target).value)"
           ></textarea>
@@ -153,7 +153,7 @@
               [disabled]="isSubmitting()"
               (click)="registerForEvent()"
             >
-              {{ isSubmitting() ? 'Registering...' : 'Confirm registration' }}
+              {{ isSubmitting() ? 'Saving...' : 'Save my seat' }}
             </button>
           } @else {
             <a

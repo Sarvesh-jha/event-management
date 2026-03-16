@@ -70,7 +70,7 @@ export class AuthService {
     department = 'Student Affairs',
   ): Observable<AuthSession> {
     if (this.shouldUsePreviewMode(error)) {
-      // Preview mode keeps the frontend usable while the matching backend APIs are still being built.
+      // Keep the app usable during frontend work even if the auth API is temporarily down.
       const previewSession = this.createPreviewSession(email, fullName, department);
       this.persistSession(previewSession, true);
       return of(previewSession);
@@ -137,7 +137,7 @@ export class AuthService {
         role,
       },
       previewMode: true,
-      message: 'Preview mode enabled while backend authentication APIs are still offline.',
+      message: 'Sample sign-in mode is on because the auth API could not be reached.',
     };
   }
 

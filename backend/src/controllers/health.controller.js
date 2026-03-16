@@ -7,7 +7,7 @@ const getHealthStatus = (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Smart Campus Event Management API is healthy.',
+    message: 'API and database look healthy.',
     environment: env.nodeEnv,
     database: isDatabaseConnected ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString(),

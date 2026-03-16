@@ -184,7 +184,7 @@ export class EventService {
         this.readString(responseRecord['attendeeName']) ??
         this.readString(dataRecord['attendeeName']) ??
         activeUser?.fullName ??
-        'Campus Student',
+        'Student User',
       attendeeEmail:
         this.readString(responseRecord['attendeeEmail']) ??
         this.readString(dataRecord['attendeeEmail']) ??
@@ -230,12 +230,12 @@ export class EventService {
     return {
       registrationId: `preview-reg-${Date.now()}`,
       eventId,
-      attendeeName: activeUser?.fullName ?? 'Campus Student',
+      attendeeName: activeUser?.fullName ?? 'Student User',
       attendeeEmail: activeUser?.email ?? 'student@campus.edu',
       qrCodeToken: `PREVIEW-${eventId.toUpperCase().slice(0, 6)}-${Date.now()}`,
       status: 'confirmed',
       checkedIn: false,
-      message: `${eventTitle} registration is saved in preview mode until the live endpoint is ready.`,
+      message: `${eventTitle} was saved in sample mode because the live registration API is unavailable.`,
     };
   }
 

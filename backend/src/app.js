@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Welcome to the Smart Campus Event Management API.',
+    message: 'Smart Campus Events API is running.',
     version: 'v1',
   });
 });

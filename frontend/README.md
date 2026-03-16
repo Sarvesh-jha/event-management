@@ -1,22 +1,25 @@
 # Smart Campus Events Frontend
 
-Angular frontend for the Smart Campus Event Management System.
+This is the Angular client for the Smart Campus Events project.
 
-## Available pages
+## Main routes
 
-- `/events` for event discovery
-- `/events/:id` for event details and registration
-- `/login` for student and admin sign in
-- `/register` for student account creation
-- `/admin` for analytics and admin overview
+- `/events` - browse available events
+- `/events/:id` - event details and registration
+- `/my-registrations` - student passes, notifications, and certificates
+- `/login` - shared login page for students and admins
+- `/register` - student signup
+- `/admin` - admin dashboard and analytics
 
-## Development
+## Local development
 
 ```bash
 npm install
 npm start
 ```
 
-The frontend targets the backend API at `http://localhost:5000/api/v1`.
+The dev app runs on `http://localhost:4200`.
 
-If the backend endpoints are not ready yet, the app automatically falls back to preview data so the UI remains usable during development.
+When the frontend is served on port `4200`, it targets the backend at `http://localhost:5001/api/v1`.
+
+If a backend route is unavailable during frontend work, the app falls back to sample data so the screens still render.

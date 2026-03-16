@@ -1,32 +1,28 @@
-# Smart Campus Event Management System
+# Smart Campus Events
 
-A complete MEAN stack project for discovering, registering for, and managing college events.
+Smart Campus Events is a full-stack campus event platform built with the MEAN stack. The idea behind it is simple: most college events get announced in too many places, registrations happen in different forms, and attendance tracking becomes messy on the day of the event.
 
-This project is organized into two apps:
+This project pulls those pieces into one workflow. Students can find events, save their seat, receive reminders, show a QR pass at check-in, and download a certificate later. Admins get a dashboard to create events, manage turnout, and track participation trends.
 
-- `backend/` - Express.js + Node.js REST API with MongoDB
-- `frontend/` - Angular application for students and admins
+## What is already working
 
-## Features
+- student signup and login with JWT auth
+- admin login and protected admin routes
+- event create, edit, delete, publish, and complete flows
+- student registration with duplicate registration checks
+- QR code generation for event entry
+- check-in verification from the admin side
+- reminder notifications for upcoming events
+- registration email confirmation
+- PDF certificate generation after completion
+- analytics dashboard with charts
 
-- Student signup and login with JWT authentication
-- Admin login and protected admin actions
-- Event create, update, delete, publish, and complete flows
-- Student event registration with duplicate prevention
-- QR code generation for event check-in
-- QR verification for on-site entry
-- Upcoming event reminders and in-app notifications
-- Registration confirmation emails with Nodemailer
-- PDF certificate generation after event completion
-- Analytics dashboard with Chart.js
+## Stack
 
-## Tech Stack
-
-- MongoDB
+- MongoDB + Mongoose
 - Express.js
 - Angular
 - Node.js
-- Mongoose
 - JWT
 - bcryptjs
 - Nodemailer
@@ -34,7 +30,7 @@ This project is organized into two apps:
 - QRCode
 - Chart.js
 
-## Project Structure
+## Project layout
 
 ```text
 smart-campus-events/
@@ -49,25 +45,24 @@ smart-campus-events/
 │   │   ├── scripts/
 │   │   ├── services/
 │   │   └── utils/
-│   └── package.json
 ├── frontend/
 │   ├── src/
 │   │   └── app/
 │   │       ├── core/
 │   │       ├── features/
 │   │       └── shared/
-│   └── package.json
 └── README.md
 ```
 
-## Prerequisites
+## Run it locally
+
+### 1. Prerequisites
 
 - Node.js 20 LTS recommended
 - npm
 - MongoDB running locally on `mongodb://127.0.0.1:27017`
-- Angular CLI is optional because the project uses the local CLI from `node_modules`
 
-## Backend Setup
+### 2. Start the backend
 
 ```bash
 cd backend
@@ -78,14 +73,9 @@ npm run seed:demo
 npm run dev
 ```
 
-Default backend environment values are already documented in [backend/.env.example](/Users/sarveshjha/event management/backend/.env.example).
+The environment template is in [`backend/.env.example`](backend/.env.example).
 
-Important local note:
-
-- This project is currently configured with `PORT=5001`
-- The Angular frontend targets `http://localhost:5001/api/v1` when running on port `4200`
-
-## Frontend Setup
+### 3. Start the frontend
 
 ```bash
 cd frontend
@@ -93,38 +83,39 @@ npm install
 npm start
 ```
 
-Frontend URL:
+Open:
 
-- `http://localhost:4200`
+- frontend: `http://localhost:4200`
+- backend: `http://localhost:5001`
 
-Backend URL:
+## Local setup note
 
-- `http://localhost:5001`
+The API is configured for `5001` in this workspace because port `5000` was already occupied on the machine where the project was being tested. The frontend already points to `5001` when it runs on `4200`, so nothing extra is needed locally.
 
-## Demo Credentials
+## Demo access
 
 Admin account:
 
-- Email: `admin@campus.edu`
-- Password: `Admin@12345`
+- email: `admin@campus.edu`
+- password: `Admin@12345`
 
-Students can create accounts from the register page.
+Student accounts can be created from the register page.
 
-## Useful Scripts
+## Useful scripts
 
 Backend:
 
-- `npm run dev` - start backend with nodemon
-- `npm start` - start backend with node
-- `npm run seed:admin` - create the default admin account
-- `npm run seed:demo` - seed demo events
+- `npm run dev` - start the API with nodemon
+- `npm start` - start the API with node
+- `npm run seed:admin` - create the seeded admin account
+- `npm run seed:demo` - insert demo events
 
 Frontend:
 
-- `npm start` - run Angular development server
-- `npm run build` - create production build
+- `npm start` - run the Angular dev server
+- `npm run build` - create a production build
 
-## Main API Areas
+## Main API areas
 
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
@@ -139,10 +130,19 @@ Frontend:
 - `GET /api/v1/notifications/me`
 - `GET /api/v1/analytics/events`
 
-## Notes
+## A few practical notes
 
-- When SMTP credentials are not configured, registration emails are generated in preview mode and logged by the backend.
-- Certificates are available only after the event is marked as completed.
-- Reminder processing runs through the notification service and can also be triggered through the reminder endpoint.
+- If SMTP credentials are missing, emails are still generated in preview mode and logged by the backend.
+- Certificates are only available after the student has checked in and the event is marked completed.
+- If the frontend cannot reach an API during development, it falls back to sample data so the UI remains usable.
 
+<<<<<<< HEAD
 
+=======
+## What I would improve next
+
+- add automated tests around auth, registration, and certificate flows
+- support image upload for event covers instead of manual gradient values
+- add stronger audit logging for admin actions
+- package the app for deployment with Docker or a CI pipeline
+>>>>>>> 488fe2f (maked it more clean)

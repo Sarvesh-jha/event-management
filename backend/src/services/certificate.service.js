@@ -22,7 +22,7 @@ const generateCertificateBuffer = async ({ registration, user, event }) => {
   document.fillColor('#0f172a');
   document
     .fontSize(18)
-    .text('Smart Campus Event Management System', 50, 45, { align: 'center' });
+    .text('Smart Campus Events', 50, 45, { align: 'center' });
 
   document
     .fontSize(32)

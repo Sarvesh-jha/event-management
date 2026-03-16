@@ -1,10 +1,10 @@
 <section class="student-hero section-card">
   <div>
-    <span class="eyebrow">Student dashboard</span>
-    <h1 class="hero-title">Manage your <em>event journey</em> in one place.</h1>
+    <span class="eyebrow">My passes</span>
+    <h1 class="hero-title">Keep your event passes, check-ins, and <em>certificates</em> together.</h1>
     <p>
-      Review registrations, keep your QR codes ready for check-in, and download certificates once
-      events are completed.
+      This page keeps your registrations, QR passes, reminder updates, and certificate downloads
+      in one place.
     </p>
   </div>
 </section>
@@ -23,7 +23,7 @@
       <article class="section-card student-panel">
         <div class="student-panel__header">
           <h2>My registrations</h2>
-          <p>Every confirmed seat, waitlist entry, and check-in status is shown here.</p>
+          <p>Each registration shows your current status and QR pass for entry.</p>
         </div>
 
         @if (!registrations().length) {
@@ -101,12 +101,12 @@
       <article class="section-card student-panel">
         <div class="student-panel__header">
           <h2>Notifications</h2>
-          <p>Upcoming reminders and registration updates from the platform.</p>
+          <p>Reminder messages and registration updates show up here.</p>
         </div>
 
         @if (!notifications().length) {
           <div class="student-empty">
-            <p>No notifications yet.</p>
+            <p>You are all caught up.</p>
           </div>
         } @else {
           <div class="notification-list">

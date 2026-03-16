@@ -5,24 +5,24 @@
 } @else if (summary(); as dashboard) {
   <section class="dashboard-hero section-card">
     <div class="dashboard-hero__copy">
-      <span class="eyebrow">Admin overview</span>
-      <h1 class="hero-title">Run the campus events engine with <em>real-time control</em>.</h1>
+      <span class="eyebrow">Events desk</span>
+      <h1 class="hero-title">Manage campus events from <em>one dashboard</em>.</h1>
       <p>
-        Create events, verify check-ins, monitor participation trends, and keep the student
-        experience moving with a single dashboard.
+        Create events, verify QR passes, track turnout, and keep the whole event flow in one place
+        instead of juggling forms and spreadsheets.
       </p>
     </div>
 
     <div class="dashboard-hero__panel">
       <span>Completion rate</span>
       <strong>{{ dashboard.completionRate }}%</strong>
-      <small>Checked-in registrations that belong to completed or finished events.</small>
+      <small>Share of registrations that ended in attendance for completed events.</small>
     </div>
   </section>
 
   @if (isPreviewMode()) {
     <p class="status-message status-message--warning">
-      Preview analytics are shown because the live dashboard endpoint is not available yet.
+      Showing sample analytics because the live dashboard endpoint is unavailable.
     </p>
   }
 
@@ -80,7 +80,7 @@
     <article class="dashboard-panel section-card">
       <div class="dashboard-panel__header">
         <h2>{{ editingEventId() ? 'Edit event' : 'Create event' }}</h2>
-        <p>Manage published, draft, and completed events from this form.</p>
+        <p>Use this form to add a new event or update an existing one.</p>
       </div>
 
       <form class="event-form" [formGroup]="form" (ngSubmit)="submitEvent()">
@@ -194,7 +194,7 @@
     <article class="dashboard-panel section-card">
       <div class="dashboard-panel__header">
         <h2>QR check-in verifier</h2>
-        <p>Paste a QR token to verify a participant at the event entrance.</p>
+        <p>Paste a token from a student's QR pass to record entry.</p>
       </div>
 
       <div class="qr-panel">
@@ -236,7 +236,7 @@
     <article class="dashboard-panel section-card">
       <div class="dashboard-panel__header">
         <h2>Manage events</h2>
-        <p>Edit, complete, or remove published events without leaving the dashboard.</p>
+        <p>Quick actions for draft, published, and completed events.</p>
       </div>
 
       <div class="event-admin-list">
@@ -276,7 +276,7 @@
     <article class="dashboard-panel section-card">
       <div class="dashboard-panel__header">
         <h2>Recent activity</h2>
-        <p>The latest platform actions, reminders, and registration updates.</p>
+        <p>Recent reminders, registrations, and admin-side updates.</p>
       </div>
 
       <div class="activity-list">
