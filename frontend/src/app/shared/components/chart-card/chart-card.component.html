@@ -1,0 +1,12 @@
+<article class="chart-card section-card">
+  <div class="chart-card__header">
+    <h3>{{ title }}</h3>
+    @if (subtitle) {
+      <p>{{ subtitle }}</p>
+    }
+  </div>
+
+  <div class="chart-card__canvas">
+    <canvas #chartCanvas></canvas>
+  </div>
+</article>

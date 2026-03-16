@@ -1,0 +1,126 @@
+.events-hero,
+.events-filters,
+.spotlight {
+  padding: 1.5rem;
+}
+
+.events-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 1.5rem;
+}
+
+.events-hero__copy,
+.spotlight__copy {
+  display: grid;
+  gap: 1rem;
+}
+
+.events-hero__copy p {
+  max-width: 52rem;
+  font-size: 1.05rem;
+}
+
+.events-hero__actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.events-hero__stats {
+  display: grid;
+  gap: 1rem;
+}
+
+.events-hero__stats article,
+.spotlight__panel {
+  padding: 1.15rem;
+  border-radius: 1.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.events-hero__stats strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 2.1rem;
+}
+
+.events-filters {
+  display: grid;
+  grid-template-columns: 1.8fr 0.8fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.events-filters label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.events-filters span {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.events-filters input,
+.events-filters select {
+  width: 100%;
+  padding: 1rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text);
+}
+
+.spotlight {
+  display: grid;
+  grid-template-columns: 1.25fr 0.8fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.spotlight__chips {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.spotlight__chips span {
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.spotlight__panel {
+  display: grid;
+  align-content: end;
+  gap: 0.7rem;
+  min-height: 16rem;
+  color: #fbfdff;
+}
+
+.spotlight__panel small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.loading-card {
+  padding: 1.8rem;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .events-hero,
+  .events-filters,
+  .spotlight,
+  .events-grid {
+    grid-template-columns: 1fr;
+  }
+}

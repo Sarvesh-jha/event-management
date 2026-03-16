@@ -1,0 +1,56 @@
+<article class="event-card section-card">
+  <div class="event-card__cover" [style.background]="event().coverGradient">
+    <div class="event-card__meta">
+      <span>{{ event().category }}</span>
+      <span>{{ event().mode }}</span>
+    </div>
+
+    <div class="event-card__headline">
+      <p>{{ event().department }}</p>
+      <h3>{{ event().title }}</h3>
+    </div>
+  </div>
+
+  <div class="event-card__body">
+    <p>{{ event().shortDescription }}</p>
+
+    <dl class="event-card__facts">
+      <div>
+        <dt>Date</dt>
+        <dd>{{ event().startDate | date: 'EEE, d MMM y' }}</dd>
+      </div>
+      <div>
+        <dt>Time</dt>
+        <dd>{{ event().startDate | date: 'shortTime' }}</dd>
+      </div>
+      <div>
+        <dt>Venue</dt>
+        <dd>{{ event().venue }}</dd>
+      </div>
+      <div>
+        <dt>Seats left</dt>
+        <dd>{{ event().capacity - event().registeredCount }}</dd>
+      </div>
+    </dl>
+
+    <div class="event-card__occupancy">
+      <div>
+        <strong>{{ occupancyRate() }}%</strong>
+        <span>filled</span>
+      </div>
+      <div class="event-card__bar">
+        <span [style.width.%]="occupancyRate()"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-card__footer">
+    <div class="event-card__tags">
+      @for (tag of event().tags.slice(0, 3); track tag) {
+        <span>{{ tag }}</span>
+      }
+    </div>
+
+    <a class="primary-button" [routerLink]="['/events', event().id]">View details</a>
+  </div>
+</article>

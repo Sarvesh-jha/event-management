@@ -1,0 +1,173 @@
+@if (loading()) {
+  <section class="detail-placeholder section-card">Loading event details...</section>
+} @else if (errorMessage() && !event()) {
+  <section class="detail-placeholder section-card">{{ errorMessage() }}</section>
+} @else if (event(); as activeEvent) {
+  <section class="detail-hero section-card">
+    <div class="detail-hero__copy">
+      <span class="eyebrow">{{ activeEvent.category }}</span>
+      <h1 class="hero-title">{{ activeEvent.title }}</h1>
+      <p>{{ activeEvent.description }}</p>
+
+      <div class="detail-hero__facts">
+        <article>
+          <span>Date</span>
+          <strong>{{ activeEvent.startDate | date: 'EEE, d MMM y' }}</strong>
+        </article>
+        <article>
+          <span>Time</span>
+          <strong>{{ activeEvent.startDate | date: 'shortTime' }}</strong>
+        </article>
+        <article>
+          <span>Venue</span>
+          <strong>{{ activeEvent.venue }}</strong>
+        </article>
+        <article>
+          <span>Organizer</span>
+          <strong>{{ activeEvent.organizer }}</strong>
+        </article>
+      </div>
+    </div>
+
+    <aside class="detail-hero__aside" [style.background]="activeEvent.coverGradient">
+      <p>Keynote</p>
+      <strong>{{ activeEvent.keynote }}</strong>
+      <small>{{ activeEvent.mode }} experience</small>
+
+      <div class="detail-hero__meter">
+        <div>
+          <span>Occupancy</span>
+          <strong>{{ occupancyRate() }}%</strong>
+        </div>
+        <div class="detail-hero__bar">
+          <span [style.width.%]="occupancyRate()"></span>
+        </div>
+        <small>{{ seatsRemaining() }} seats remaining</small>
+      </div>
+    </aside>
+  </section>
+
+  @if (isPreviewMode()) {
+    <p class="status-message status-message--warning">
+      Preview data is active for this event while the live endpoint is unavailable.
+    </p>
+  }
+
+  @if (errorMessage()) {
+    <p class="status-message status-message--error">{{ errorMessage() }}</p>
+  }
+
+  <section class="detail-grid">
+    <article class="detail-section section-card">
+      <h2>Agenda</h2>
+      <div class="timeline">
+        @for (agendaItem of activeEvent.agenda; track agendaItem.time + agendaItem.title) {
+          <div class="timeline__item">
+            <strong>{{ agendaItem.time }}</strong>
+            <div>
+              <h3>{{ agendaItem.title }}</h3>
+              <p>{{ agendaItem.description }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+
+    <aside class="registration-card section-card">
+      <div class="registration-card__header">
+        <h2>Register for this event</h2>
+        <p>
+          @if (isAuthenticated()) {
+            You are signing up as {{ currentUser()?.fullName }}.
+          } @else {
+            Sign in with a student account to confirm your seat.
+          }
+        </p>
+      </div>
+
+      @if (registration(); as activeRegistration) {
+        <div class="status-message status-message--success">
+          {{
+            activeRegistration.message ??
+              'Your registration is active and ready for check-in.'
+          }}
+        </div>
+
+        <div class="registration-card__receipt">
+          <div class="registration-card__receipt-grid">
+            <div>
+              <span>Registration ID</span>
+              <strong>{{ activeRegistration.registrationId }}</strong>
+              <span>QR token</span>
+              <code>{{ activeRegistration.qrCodeToken }}</code>
+              <span>Status</span>
+              <strong class="registration-card__status">{{ activeRegistration.status }}</strong>
+            </div>
+
+            @if (activeRegistration.qrCodeDataUrl) {
+              <img
+                [src]="activeRegistration.qrCodeDataUrl"
+                alt="Registration QR code"
+                class="registration-card__qr"
+              >
+            }
+          </div>
+
+          <small>
+            {{ activeRegistration.checkedIn ? 'Attendance recorded.' : 'Show this QR code at event entry.' }}
+          </small>
+        </div>
+
+        <div class="registration-card__actions">
+          <a class="secondary-button" routerLink="/my-registrations">Open my registrations</a>
+
+          <button
+            class="primary-button"
+            type="button"
+            [disabled]="!activeRegistration.checkedIn || isDownloadingCertificate()"
+            (click)="downloadCertificate(activeRegistration)"
+          >
+            {{
+              isDownloadingCertificate()
+                ? 'Preparing PDF...'
+                : 'Download certificate'
+            }}
+          </button>
+        </div>
+      } @else {
+        <label>
+          <span>Note for organizers</span>
+          <textarea
+            rows="5"
+            placeholder="Accessibility needs, interest areas, or team details"
+            [value]="note()"
+            (input)="updateNote($any($event.target).value)"
+          ></textarea>
+        </label>
+
+        <div class="registration-card__actions">
+          @if (isAuthenticated()) {
+            <button
+              class="primary-button"
+              type="button"
+              [disabled]="isSubmitting()"
+              (click)="registerForEvent()"
+            >
+              {{ isSubmitting() ? 'Registering...' : 'Confirm registration' }}
+            </button>
+          } @else {
+            <a
+              class="primary-button"
+              routerLink="/login"
+              [queryParams]="{ redirect: '/events/' + activeEvent.id }"
+            >
+              Sign in to register
+            </a>
+          }
+
+          <a class="secondary-button" routerLink="/events">Back to events</a>
+        </div>
+      }
+    </aside>
+  </section>
+}

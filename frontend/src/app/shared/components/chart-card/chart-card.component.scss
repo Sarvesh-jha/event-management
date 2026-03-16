@@ -1,0 +1,15 @@
+.chart-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.chart-card__header {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.chart-card__canvas {
+  position: relative;
+  min-height: 18rem;
+}

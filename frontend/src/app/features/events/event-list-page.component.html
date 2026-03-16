@@ -1,0 +1,103 @@
+<section class="events-hero section-card">
+  <div class="events-hero__copy">
+    <span class="eyebrow">Campus pulse</span>
+    <h1 class="hero-title">Discover <em>remarkable</em> student experiences.</h1>
+    <p>
+      Explore workshops, showcases, forums, and student-led gatherings across campus. Register
+      early, save your spot, and keep everything in one place.
+    </p>
+
+    <div class="events-hero__actions">
+      @if (isAuthenticated() && !isAdmin()) {
+        <a class="primary-button" routerLink="/my-registrations">Open my registrations</a>
+      } @else {
+        <a class="primary-button" routerLink="/register">Create student account</a>
+      }
+      <a class="secondary-button" [routerLink]="isAdmin() ? '/admin' : '/login'">
+        {{ isAdmin() ? 'Open admin dashboard' : 'Admin sign in' }}
+      </a>
+    </div>
+  </div>
+
+  <div class="events-hero__stats">
+    <article>
+      <strong>{{ events().length }}</strong>
+      <span>Upcoming events</span>
+    </article>
+    <article>
+      <strong>{{ totalRegistrations() }}</strong>
+      <span>Total registrations</span>
+    </article>
+    <article>
+      <strong>{{ totalCapacity() - totalRegistrations() }}</strong>
+      <span>Seats still open</span>
+    </article>
+  </div>
+</section>
+
+@if (isPreviewMode()) {
+  <p class="status-message status-message--warning">
+    Preview data is currently active because the live event endpoints are not available yet.
+  </p>
+}
+
+@if (errorMessage()) {
+  <p class="status-message status-message--error">{{ errorMessage() }}</p>
+}
+
+<section class="events-filters section-card">
+  <label>
+    <span>Search events</span>
+    <input
+      type="search"
+      placeholder="Search by title, venue, or department"
+      [value]="searchTerm()"
+      (input)="updateSearchTerm($any($event.target).value)"
+    >
+  </label>
+
+  <label>
+    <span>Category</span>
+    <select [value]="selectedCategory()" (change)="updateCategory($any($event.target).value)">
+      @for (category of categories(); track category) {
+        <option [value]="category">{{ category }}</option>
+      }
+    </select>
+  </label>
+</section>
+
+@if (spotlightEvent(); as spotlight) {
+  <section class="spotlight section-card">
+    <div class="spotlight__copy">
+      <span class="eyebrow">Spotlight event</span>
+      <h2>{{ spotlight.title }}</h2>
+      <p>{{ spotlight.description }}</p>
+
+      <div class="spotlight__chips">
+        <span>{{ spotlight.category }}</span>
+        <span>{{ spotlight.department }}</span>
+        <span>{{ spotlight.mode }}</span>
+      </div>
+    </div>
+
+    <div class="spotlight__panel" [style.background]="spotlight.coverGradient">
+      <strong>{{ spotlight.keynote }}</strong>
+      <small>{{ spotlight.venue }}</small>
+      <a class="primary-button" [routerLink]="['/events', spotlight.id]">Register now</a>
+    </div>
+  </section>
+}
+
+<section class="events-grid">
+  @if (loading()) {
+    <article class="loading-card section-card">Loading campus events...</article>
+  } @else if (!filteredEvents().length) {
+    <article class="loading-card section-card">
+      No events matched your filters. Try a different category or search term.
+    </article>
+  } @else {
+    @for (event of filteredEvents(); track event.id) {
+      <app-event-card [event]="event" />
+    }
+  }
+</section>

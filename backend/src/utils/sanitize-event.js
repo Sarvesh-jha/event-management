@@ -1,0 +1,25 @@
+const sanitizeEvent = (event) => ({
+  id: event._id.toString(),
+  title: event.title,
+  shortDescription: event.shortDescription,
+  description: event.description,
+  category: event.category,
+  department: event.department,
+  startDate: event.startDate,
+  endDate: event.endDate,
+  venue: event.venue,
+  mode: event.mode,
+  capacity: event.capacity,
+  registeredCount: event.registeredCount,
+  organizer: event.organizer,
+  keynote: event.keynote,
+  tags: event.tags,
+  coverGradient: event.coverGradient,
+  agenda: event.agenda,
+  status: event.status,
+  createdBy: event.createdBy?._id ? event.createdBy._id.toString() : event.createdBy,
+  createdAt: event.createdAt,
+  updatedAt: event.updatedAt,
+});
+
+module.exports = sanitizeEvent;

@@ -1,0 +1,139 @@
+<section class="student-hero section-card">
+  <div>
+    <span class="eyebrow">Student dashboard</span>
+    <h1 class="hero-title">Manage your <em>event journey</em> in one place.</h1>
+    <p>
+      Review registrations, keep your QR codes ready for check-in, and download certificates once
+      events are completed.
+    </p>
+  </div>
+</section>
+
+@if (errorMessage()) {
+  <p class="status-message status-message--error">{{ errorMessage() }}</p>
+}
+
+@if (loading()) {
+  <section class="student-grid">
+    <article class="section-card student-empty">Loading your registrations...</article>
+  </section>
+} @else {
+  <section class="student-grid">
+    <div class="student-grid__main">
+      <article class="section-card student-panel">
+        <div class="student-panel__header">
+          <h2>My registrations</h2>
+          <p>Every confirmed seat, waitlist entry, and check-in status is shown here.</p>
+        </div>
+
+        @if (!registrations().length) {
+          <div class="student-empty">
+            <p>You have not registered for any events yet.</p>
+            <a class="primary-button" routerLink="/events">Explore events</a>
+          </div>
+        } @else {
+          <div class="registration-list">
+            @for (registration of registrations(); track registration.registrationId) {
+              <article class="registration-item">
+                <div class="registration-item__content">
+                  <div>
+                    <h3>{{ registration.eventTitle }}</h3>
+                    <p>Registration ID: {{ registration.registrationId }}</p>
+                  </div>
+
+                  <div class="registration-item__badges">
+                    <span class="badge">{{ registration.status }}</span>
+                    <span class="badge" [class.badge--success]="registration.checkedIn">
+                      {{ registration.checkedIn ? 'Checked in' : 'Pending check-in' }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="registration-item__meta">
+                  @if (registration.qrCodeDataUrl) {
+                    <img
+                      [src]="registration.qrCodeDataUrl"
+                      alt="Registration QR code"
+                      class="registration-item__qr"
+                    >
+                  }
+
+                  <div class="registration-item__details">
+                    <p><strong>QR token:</strong> {{ registration.qrCodeToken }}</p>
+                    @if (registration.checkedInAt) {
+                      <p>
+                        <strong>Checked in:</strong>
+                        {{ registration.checkedInAt | date: 'medium' }}
+                      </p>
+                    }
+                    @if (registration.note) {
+                      <p><strong>Note:</strong> {{ registration.note }}</p>
+                    }
+                  </div>
+                </div>
+
+                <div class="registration-item__actions">
+                  <a class="secondary-button" [routerLink]="['/events', registration.eventId]">
+                    View event
+                  </a>
+
+                  <button
+                    class="primary-button"
+                    type="button"
+                    [disabled]="!registration.checkedIn || activeDownloadId() === registration.registrationId"
+                    (click)="downloadCertificate(registration)"
+                  >
+                    {{
+                      activeDownloadId() === registration.registrationId
+                        ? 'Preparing PDF...'
+                        : 'Download certificate'
+                    }}
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </article>
+    </div>
+
+    <aside class="student-grid__side">
+      <article class="section-card student-panel">
+        <div class="student-panel__header">
+          <h2>Notifications</h2>
+          <p>Upcoming reminders and registration updates from the platform.</p>
+        </div>
+
+        @if (!notifications().length) {
+          <div class="student-empty">
+            <p>No notifications yet.</p>
+          </div>
+        } @else {
+          <div class="notification-list">
+            @for (notification of notifications(); track notification.id) {
+              <article class="notification-item" [class.notification-item--read]="notification.isRead">
+                <div>
+                  <strong>{{ notification.title }}</strong>
+                  <p>{{ notification.message }}</p>
+                  @if (notification.createdAt) {
+                    <small>{{ notification.createdAt | date: 'medium' }}</small>
+                  }
+                </div>
+
+                @if (!notification.isRead) {
+                  <button
+                    type="button"
+                    class="ghost-button"
+                    (click)="markAsRead(notification.id)"
+                  >
+                    Mark read
+                  </button>
+                }
+              </article>
+            }
+          </div>
+        }
+      </article>
+    </aside>
+  </section>
+}

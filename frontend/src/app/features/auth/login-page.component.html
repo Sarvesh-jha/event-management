@@ -1,0 +1,53 @@
+<section class="auth-layout">
+  <article class="auth-panel auth-panel--intro section-card">
+    <span class="eyebrow">Welcome back</span>
+    <h1 class="hero-title">Sign in and keep your <em>campus calendar</em> moving.</h1>
+    <p>
+      Students can discover and register for events, while admins can step into the dashboard to
+      track registrations and campus engagement.
+    </p>
+
+    <div class="auth-panel__notes">
+      <article>
+        <strong>Student view</strong>
+        <span>Use your campus email to browse and register for upcoming events.</span>
+      </article>
+      <article>
+        <strong>Admin preview</strong>
+        <span>Use an email containing `admin` to preview the administrator dashboard.</span>
+      </article>
+    </div>
+  </article>
+
+  <article class="auth-panel auth-panel--form section-card">
+    <div class="auth-panel__header">
+      <h2>Account login</h2>
+      <p>JWT-backed authentication will connect to the backend as those APIs are completed.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="status-message status-message--error">{{ errorMessage() }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        <span>Email address</span>
+        <input type="email" formControlName="email" placeholder="student@campus.edu">
+      </label>
+
+      <label>
+        <span>Password</span>
+        <input type="password" formControlName="password" placeholder="Minimum 8 characters">
+      </label>
+
+      <button class="primary-button auth-panel__submit" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="auth-panel__footer">
+      Need a student account?
+      <a routerLink="/register">Create one here</a>
+    </p>
+  </article>
+</section>

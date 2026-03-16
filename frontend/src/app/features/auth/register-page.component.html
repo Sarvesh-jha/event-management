@@ -1,0 +1,85 @@
+<section class="auth-layout">
+  <article class="auth-panel auth-panel--intro section-card">
+    <span class="eyebrow">Student onboarding</span>
+    <h1 class="hero-title">Create your seat at the <em>center of campus life</em>.</h1>
+    <p>
+      Join the platform to register for events, receive confirmations, and keep track of upcoming
+      sessions across your department and student clubs.
+    </p>
+
+    <div class="auth-panel__notes">
+      <article>
+        <strong>One place for every event</strong>
+        <span>Register, manage attendance, and track confirmations without jumping between tools.</span>
+      </article>
+      <article>
+        <strong>Admin accounts</strong>
+        <span>Admin sign-in is available from the login page and is typically managed separately.</span>
+      </article>
+    </div>
+  </article>
+
+  <article class="auth-panel auth-panel--form section-card">
+    <div class="auth-panel__header">
+      <h2>Student registration</h2>
+      <p>Create your account to start discovering campus events.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="status-message status-message--error">{{ errorMessage() }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        <span>Full name</span>
+        <input type="text" formControlName="fullName" placeholder="Aarohi Sharma">
+      </label>
+
+      <label>
+        <span>Campus email</span>
+        <input type="email" formControlName="email" placeholder="student@campus.edu">
+      </label>
+
+      <div class="auth-panel__grid">
+        <label>
+          <span>Student ID</span>
+          <input type="text" formControlName="studentId" placeholder="CS2026012">
+        </label>
+
+        <label>
+          <span>Department</span>
+          <select formControlName="department">
+            @for (department of departments; track department) {
+              <option [value]="department">{{ department }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="auth-panel__grid">
+        <label>
+          <span>Password</span>
+          <input type="password" formControlName="password" placeholder="Minimum 8 characters">
+        </label>
+
+        <label>
+          <span>Confirm password</span>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Repeat your password"
+          >
+        </label>
+      </div>
+
+      <button class="primary-button auth-panel__submit" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Creating account...' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="auth-panel__footer">
+      Already registered?
+      <a routerLink="/login">Sign in here</a>
+    </p>
+  </article>
+</section>

@@ -1,0 +1,307 @@
+@if (loading()) {
+  <section class="dashboard-placeholder section-card">Loading admin insights...</section>
+} @else if (errorMessage() && !summary()) {
+  <section class="dashboard-placeholder section-card">{{ errorMessage() }}</section>
+} @else if (summary(); as dashboard) {
+  <section class="dashboard-hero section-card">
+    <div class="dashboard-hero__copy">
+      <span class="eyebrow">Admin overview</span>
+      <h1 class="hero-title">Run the campus events engine with <em>real-time control</em>.</h1>
+      <p>
+        Create events, verify check-ins, monitor participation trends, and keep the student
+        experience moving with a single dashboard.
+      </p>
+    </div>
+
+    <div class="dashboard-hero__panel">
+      <span>Completion rate</span>
+      <strong>{{ dashboard.completionRate }}%</strong>
+      <small>Checked-in registrations that belong to completed or finished events.</small>
+    </div>
+  </section>
+
+  @if (isPreviewMode()) {
+    <p class="status-message status-message--warning">
+      Preview analytics are shown because the live dashboard endpoint is not available yet.
+    </p>
+  }
+
+  @if (errorMessage()) {
+    <p class="status-message status-message--error">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="status-message status-message--success">{{ successMessage() }}</p>
+  }
+
+  @if (qrCheckInMessage()) {
+    <p class="status-message status-message--success">{{ qrCheckInMessage() }}</p>
+  }
+
+  <section class="dashboard-stats">
+    @for (card of statCards(); track card.label) {
+      <article class="dashboard-card section-card">
+        <span>{{ card.label }}</span>
+        <strong>{{ card.value }}</strong>
+        <p>{{ card.description }}</p>
+      </article>
+    }
+  </section>
+
+  <section class="dashboard-charts">
+    <app-chart-card
+      title="Registration trend"
+      subtitle="Daily registrations over the last 7 days"
+      chartType="line"
+      [labels]="chartLabels(dashboard.registrationTrend)"
+      [values]="chartValues(dashboard.registrationTrend)"
+      [colors]="['#38bdf8']"
+    />
+
+    <app-chart-card
+      title="Attendance trend"
+      subtitle="Daily QR check-ins over the last 7 days"
+      chartType="bar"
+      [labels]="chartLabels(dashboard.attendanceTrend)"
+      [values]="chartValues(dashboard.attendanceTrend)"
+      [colors]="['#22c55e', '#22c55e', '#22c55e', '#22c55e', '#22c55e', '#22c55e', '#22c55e']"
+    />
+
+    <app-chart-card
+      title="Event mode mix"
+      subtitle="How current events are distributed by delivery mode"
+      chartType="doughnut"
+      [labels]="chartLabels(dashboard.modeBreakdown)"
+      [values]="chartValues(dashboard.modeBreakdown)"
+    />
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="dashboard-panel section-card">
+      <div class="dashboard-panel__header">
+        <h2>{{ editingEventId() ? 'Edit event' : 'Create event' }}</h2>
+        <p>Manage published, draft, and completed events from this form.</p>
+      </div>
+
+      <form class="event-form" [formGroup]="form" (ngSubmit)="submitEvent()">
+        <label>
+          <span>Title</span>
+          <input type="text" formControlName="title">
+        </label>
+
+        <label>
+          <span>Short description</span>
+          <input type="text" formControlName="shortDescription">
+        </label>
+
+        <label>
+          <span>Description</span>
+          <textarea rows="4" formControlName="description"></textarea>
+        </label>
+
+        <div class="event-form__grid">
+          <label>
+            <span>Category</span>
+            <input type="text" formControlName="category">
+          </label>
+
+          <label>
+            <span>Department</span>
+            <input type="text" formControlName="department">
+          </label>
+        </div>
+
+        <div class="event-form__grid">
+          <label>
+            <span>Venue</span>
+            <input type="text" formControlName="venue">
+          </label>
+
+          <label>
+            <span>Organizer</span>
+            <input type="text" formControlName="organizer">
+          </label>
+        </div>
+
+        <div class="event-form__grid">
+          <label>
+            <span>Mode</span>
+            <select formControlName="mode">
+              @for (mode of modes; track mode) {
+                <option [value]="mode">{{ mode }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            <span>Status</span>
+            <select formControlName="status">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <div class="event-form__grid">
+          <label>
+            <span>Capacity</span>
+            <input type="number" formControlName="capacity">
+          </label>
+
+          <label>
+            <span>Keynote</span>
+            <input type="text" formControlName="keynote">
+          </label>
+        </div>
+
+        <div class="event-form__grid">
+          <label>
+            <span>Start date</span>
+            <input type="datetime-local" formControlName="startDate">
+          </label>
+
+          <label>
+            <span>End date</span>
+            <input type="datetime-local" formControlName="endDate">
+          </label>
+        </div>
+
+        <label>
+          <span>Tags</span>
+          <input type="text" formControlName="tags" placeholder="AI, Workshop, Community">
+        </label>
+
+        <label>
+          <span>Cover gradient</span>
+          <input type="text" formControlName="coverGradient">
+        </label>
+
+        <div class="event-form__actions">
+          <button class="primary-button" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Saving...' : editingEventId() ? 'Update event' : 'Create event' }}
+          </button>
+
+          @if (editingEventId()) {
+            <button class="secondary-button" type="button" (click)="cancelEditing()">
+              Cancel edit
+            </button>
+          }
+        </div>
+      </form>
+    </article>
+
+    <article class="dashboard-panel section-card">
+      <div class="dashboard-panel__header">
+        <h2>QR check-in verifier</h2>
+        <p>Paste a QR token to verify a participant at the event entrance.</p>
+      </div>
+
+      <div class="qr-panel">
+        <label>
+          <span>QR token</span>
+          <input
+            type="text"
+            [value]="qrCodeToken()"
+            placeholder="Paste QR token from student registration"
+            (input)="updateQrCodeToken($any($event.target).value)"
+          >
+        </label>
+
+        <button class="primary-button" type="button" [disabled]="isVerifyingCheckIn()" (click)="verifyCheckIn()">
+          {{ isVerifyingCheckIn() ? 'Verifying...' : 'Verify check-in' }}
+        </button>
+      </div>
+
+      <div class="dashboard-panel__subsection">
+        <h3>Category participation</h3>
+        <div class="category-list">
+          @for (category of dashboard.topCategories; track category.name) {
+            <div class="category-list__item">
+              <div>
+                <strong>{{ category.name }}</strong>
+                <span>{{ category.count }} registrations</span>
+              </div>
+              <div class="category-list__bar">
+                <span [style.width.%]="categoryWidth(category.count)"></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="dashboard-panel section-card">
+      <div class="dashboard-panel__header">
+        <h2>Manage events</h2>
+        <p>Edit, complete, or remove published events without leaving the dashboard.</p>
+      </div>
+
+      <div class="event-admin-list">
+        @for (event of adminEvents(); track event.id) {
+          <article class="event-admin-card">
+            <div class="event-admin-card__cover" [style.background]="event.coverGradient"></div>
+            <div class="event-admin-card__content">
+              <div>
+                <h3>{{ event.title }}</h3>
+                <p>{{ event.shortDescription }}</p>
+              </div>
+
+              <div class="event-admin-card__meta">
+                <span>{{ event.startDate | date: 'medium' }}</span>
+                <span>{{ event.department }}</span>
+                <span>{{ event.status }}</span>
+                <span>{{ event.registeredCount }} / {{ event.capacity }} seats</span>
+              </div>
+
+              <div class="event-admin-card__actions">
+                <button class="secondary-button" type="button" (click)="editEvent(event)">
+                  Edit
+                </button>
+                <button class="secondary-button" type="button" (click)="markCompleted(event.id)">
+                  Complete
+                </button>
+                <button class="secondary-button" type="button" (click)="deleteEvent(event.id)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </article>
+
+    <article class="dashboard-panel section-card">
+      <div class="dashboard-panel__header">
+        <h2>Recent activity</h2>
+        <p>The latest platform actions, reminders, and registration updates.</p>
+      </div>
+
+      <div class="activity-list">
+        @for (activity of dashboard.recentActivity; track activity.title + activity.time) {
+          <div class="activity-list__item">
+            <strong>{{ activity.title }}</strong>
+            <p>{{ activity.detail }}</p>
+            <small>{{ activity.time }}</small>
+          </div>
+        }
+      </div>
+
+      <div class="dashboard-panel__subsection">
+        <h3>Featured events</h3>
+        <div class="highlights-grid">
+          @for (event of dashboard.featuredEvents; track event.id) {
+            <article class="highlight-card">
+              <div class="highlight-card__cover" [style.background]="event.coverGradient"></div>
+              <strong>{{ event.title }}</strong>
+              <span>{{ event.department }}</span>
+              <p>{{ event.shortDescription }}</p>
+            </article>
+          }
+        </div>
+      </div>
+    </article>
+  </section>
+}

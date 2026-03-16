@@ -1,0 +1,52 @@
+<div class="app-shell">
+  <div class="app-shell__ambient app-shell__ambient--one"></div>
+  <div class="app-shell__ambient app-shell__ambient--two"></div>
+
+  <header class="topbar">
+    <a class="brand" routerLink="/events">
+      <span class="brand__crest">SC</span>
+      <span class="brand__copy">
+        <strong>{{ appName }}</strong>
+        <small>Discover, register, and manage campus moments</small>
+      </span>
+    </a>
+
+    <nav class="topbar__nav">
+      <a routerLink="/events" routerLinkActive="is-active">Explore Events</a>
+      @if (isStudent()) {
+        <a routerLink="/my-registrations" routerLinkActive="is-active">My Registrations</a>
+      }
+      <a routerLink="/register" routerLinkActive="is-active">Student Sign Up</a>
+      <a routerLink="/login" routerLinkActive="is-active">Login</a>
+      @if (isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="is-active">Admin Dashboard</a>
+      }
+    </nav>
+
+    <div class="topbar__actions">
+      @if (isPreviewMode()) {
+        <span class="pill pill--preview">Preview mode</span>
+      }
+
+      @if (isAuthenticated()) {
+        <div class="account-chip">
+          <span class="account-chip__avatar">
+            {{ welcomeLabel().slice(0, 1) }}
+          </span>
+          <div>
+            <strong>{{ welcomeLabel() }}</strong>
+            <small>{{ isAdmin() ? 'Administrator' : 'Student account' }}</small>
+          </div>
+        </div>
+
+        <button class="ghost-button" type="button" (click)="logout()">Logout</button>
+      } @else {
+        <a class="ghost-button" routerLink="/login">Sign In</a>
+      }
+    </div>
+  </header>
+
+  <main class="page-frame">
+    <router-outlet />
+  </main>
+</div>
