@@ -145,6 +145,4 @@ Frontend:
 - Certificates are available only after the event is marked as completed.
 - Reminder processing runs through the notification service and can also be triggered through the reminder endpoint.
 
-## Development Status
 
-The full Phase 1 to Phase 10 implementation is present in this repository, including backend modules, Angular UI, analytics, certificates, and QR check-in.
