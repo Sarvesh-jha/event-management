@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const app = require('./app');
 const env = require('./config/env');
 const connectDatabase = require('./config/database');
+const { getDatabaseState } = require('./config/database');
 const { startReminderJob } = require('./jobs/reminder.job');
 
 const startServer = async () => {
@@ -23,8 +24,10 @@ const startServer = async () => {
       console.log(`${signal} received. Shutting down gracefully...`);
 
       server.close(async () => {
-        await mongoose.connection.close();
-        console.log('MongoDB connection closed.');
+        if (getDatabaseState().mode === 'mongo') {
+          await mongoose.connection.close();
+          console.log('MongoDB connection closed.');
+        }
         process.exit(0);
       });
     };

@@ -31,6 +31,7 @@ export class EventDetailPageComponent implements OnInit {
   protected readonly note = signal('');
   protected readonly registration = signal<StudentRegistration | null>(null);
   protected readonly isAuthenticated = this.authService.isAuthenticated;
+  protected readonly isAdmin = this.authService.isAdmin;
   protected readonly currentUser = this.authService.currentUser;
   protected readonly isPreviewMode = this.eventService.isPreviewMode;
 
@@ -63,7 +64,7 @@ export class EventDetailPageComponent implements OnInit {
 
     this.loadEvent(eventId);
 
-    if (this.authService.isAuthenticated()) {
+    if (this.authService.isAuthenticated() && !this.authService.isAdmin()) {
       this.loadExistingRegistration(eventId);
     }
   }
@@ -76,6 +77,11 @@ export class EventDetailPageComponent implements OnInit {
     const activeEvent = this.event();
 
     if (!activeEvent) {
+      return;
+    }
+
+    if (this.authService.isAdmin()) {
+      this.errorMessage.set('Admin accounts can manage events, but only student accounts can register.');
       return;
     }
 

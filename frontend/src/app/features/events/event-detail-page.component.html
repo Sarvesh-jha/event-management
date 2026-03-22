@@ -77,7 +77,9 @@
       <div class="registration-card__header">
         <h2>Reserve your spot</h2>
         <p>
-          @if (isAuthenticated()) {
+          @if (isAdmin()) {
+            You are logged in as admin. Admin accounts can manage events but cannot register for them.
+          } @else if (isAuthenticated()) {
             You are registering as {{ currentUser()?.fullName }}.
           } @else {
             Sign in with a student account to save your seat.
@@ -146,7 +148,9 @@
         </label>
 
         <div class="registration-card__actions">
-          @if (isAuthenticated()) {
+          @if (isAdmin()) {
+            <a class="secondary-button" routerLink="/admin">Open admin dashboard</a>
+          } @else if (isAuthenticated()) {
             <button
               class="primary-button"
               type="button"

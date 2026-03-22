@@ -1,4 +1,6 @@
 const User = require('../models/user.model');
+const { isUsingLocalDatabase } = require('../config/database');
+const localStore = require('../data/local-store');
 const createAppError = require('../utils/app-error');
 const { verifyToken } = require('../utils/jwt');
 const sanitizeUser = require('../utils/sanitize-user');
@@ -23,7 +25,9 @@ const protect = async (req, res, next) => {
     const decodedToken = verifyToken(token);
 
     // We re-fetch the user on every request so deactivated accounts cannot keep using old tokens.
-    const user = await User.findById(decodedToken.sub);
+    const user = isUsingLocalDatabase()
+      ? await localStore.findUserById(decodedToken.sub)
+      : await User.findById(decodedToken.sub);
 
     if (!user || !user.isActive) {
       next(createAppError('User account is no longer available.', 401));

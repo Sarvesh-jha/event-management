@@ -83,6 +83,12 @@
         <p>Use this form to add a new event or update an existing one.</p>
       </div>
 
+      @if (form.invalid && form.touched && !errorMessage()) {
+        <p class="status-message status-message--warning">
+          Title, description, venue, organizer, start date, and end date are required before saving.
+        </p>
+      }
+
       <form class="event-form" [formGroup]="form" (ngSubmit)="submitEvent()">
         <label>
           <span>Title</span>

@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const Event = require('../models/event.model');
 const Notification = require('../models/notification.model');
 const Registration = require('../models/registration.model');
+const { isUsingLocalDatabase } = require('../config/database');
+const localStore = require('../data/local-store');
 const createAppError = require('../utils/app-error');
 const sanitizeEvent = require('../utils/sanitize-event');
 
@@ -66,7 +68,22 @@ const validateEventPayload = (eventPayload) => {
   }
 };
 
+const sortByStartDateAscending = (left, right) =>
+  new Date(left.startDate).getTime() - new Date(right.startDate).getTime();
+
+const sortByCreatedDateDescending = (left, right) =>
+  new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+
 const listPublicEvents = async () => {
+  if (isUsingLocalDatabase()) {
+    const events = await localStore.listEvents();
+
+    return events
+      .filter((event) => ['published', 'completed'].includes(event.status))
+      .sort(sortByStartDateAscending)
+      .map(sanitizeEvent);
+  }
+
   const events = await Event.find({
     status: { $in: ['published', 'completed'] },
   }).sort({ startDate: 1 });
@@ -76,6 +93,16 @@ const listPublicEvents = async () => {
 
 const getEventById = async (eventId, { includeDraft = false } = {}) => {
   ensureValidObjectId(eventId, 'event id');
+
+  if (isUsingLocalDatabase()) {
+    const event = await localStore.findEventById(eventId);
+
+    if (!event || (!includeDraft && !['published', 'completed'].includes(event.status))) {
+      throw createAppError('Event not found.', 404);
+    }
+
+    return event;
+  }
 
   const query = includeDraft
     ? { _id: eventId }
@@ -93,6 +120,11 @@ const getEventById = async (eventId, { includeDraft = false } = {}) => {
 const getPublicEventById = async (eventId) => sanitizeEvent(await getEventById(eventId));
 
 const listAdminEvents = async () => {
+  if (isUsingLocalDatabase()) {
+    const events = await localStore.listEvents();
+    return events.sort(sortByCreatedDateDescending).map(sanitizeEvent);
+  }
+
   const events = await Event.find().sort({ createdAt: -1 });
 
   return events.map(sanitizeEvent);
@@ -101,6 +133,15 @@ const listAdminEvents = async () => {
 const createEvent = async (payload, adminUserId) => {
   const eventPayload = normalizeEventPayload(payload);
   validateEventPayload(eventPayload);
+
+  if (isUsingLocalDatabase()) {
+    const event = await localStore.createEvent({
+      ...eventPayload,
+      createdBy: adminUserId,
+    });
+
+    return sanitizeEvent(event);
+  }
 
   const event = await Event.create({
     ...eventPayload,
@@ -119,6 +160,11 @@ const updateEvent = async (eventId, payload) => {
     ...normalizedPayload,
   });
 
+  if (isUsingLocalDatabase()) {
+    const updatedEvent = await localStore.updateEvent(eventId, normalizedPayload);
+    return sanitizeEvent(updatedEvent);
+  }
+
   Object.assign(event, normalizedPayload);
   await event.save();
 
@@ -128,6 +174,15 @@ const updateEvent = async (eventId, payload) => {
 const deleteEvent = async (eventId) => {
   const event = await getEventById(eventId, { includeDraft: true });
 
+  if (isUsingLocalDatabase()) {
+    await Promise.all([
+      localStore.deleteRegistrationsByEvent(event._id),
+      localStore.deleteNotificationsByEvent(event._id),
+      localStore.deleteEvent(event._id),
+    ]);
+    return;
+  }
+
   await Registration.deleteMany({ event: event._id });
   await Notification.deleteMany({ event: event._id });
   await Event.findByIdAndDelete(event._id);
@@ -135,6 +190,15 @@ const deleteEvent = async (eventId) => {
 
 const markEventCompleted = async (eventId) => {
   const event = await getEventById(eventId, { includeDraft: true });
+
+  if (isUsingLocalDatabase()) {
+    const updatedEvent = await localStore.updateEvent(event._id, {
+      status: 'completed',
+    });
+
+    return sanitizeEvent(updatedEvent);
+  }
+
   event.status = 'completed';
   await event.save();
 

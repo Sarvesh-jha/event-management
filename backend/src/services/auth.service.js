@@ -1,4 +1,8 @@
+const bcrypt = require('bcryptjs');
+
 const User = require('../models/user.model');
+const { isUsingLocalDatabase } = require('../config/database');
+const localStore = require('../data/local-store');
 const createAppError = require('../utils/app-error');
 const { generateToken } = require('../utils/jwt');
 const sanitizeUser = require('../utils/sanitize-user');
@@ -55,6 +59,31 @@ const registerStudent = async ({
   const normalizedEmail = normalizeEmail(email);
   const normalizedStudentId = normalizeStudentId(studentId);
 
+  if (isUsingLocalDatabase()) {
+    const existingEmail = await localStore.findUserByEmail(normalizedEmail);
+
+    if (existingEmail) {
+      throw createAppError('An account with this email already exists.', 409);
+    }
+
+    const existingStudent = await localStore.findUserByStudentId(normalizedStudentId);
+
+    if (existingStudent) {
+      throw createAppError('This student ID is already registered.', 409);
+    }
+
+    const user = await localStore.createUser({
+      fullName: fullName.trim(),
+      email: normalizedEmail,
+      password: password.trim(),
+      department: department.trim(),
+      studentId: normalizedStudentId,
+      role: 'student',
+    });
+
+    return buildAuthResponse(user, 'Student account created successfully.');
+  }
+
   const existingEmail = await User.findOne({ email: normalizedEmail });
 
   if (existingEmail) {
@@ -82,6 +111,22 @@ const registerStudent = async ({
 const loginUser = async ({ email, password }) => {
   validateLoginPayload({ email, password });
 
+  if (isUsingLocalDatabase()) {
+    const user = await localStore.findUserByEmail(normalizeEmail(email), {
+      includePassword: true,
+    });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw createAppError('Invalid email or password.', 401);
+    }
+
+    if (!user.isActive) {
+      throw createAppError('This account has been deactivated.', 403);
+    }
+
+    return buildAuthResponse(user, 'Login successful.');
+  }
+
   const user = await User.findOne({ email: normalizeEmail(email) }).select('+password');
 
   if (!user || !(await user.comparePassword(password))) {
@@ -96,6 +141,16 @@ const loginUser = async ({ email, password }) => {
 };
 
 const getCurrentUser = async (userId) => {
+  if (isUsingLocalDatabase()) {
+    const user = await localStore.findUserById(userId);
+
+    if (!user || !user.isActive) {
+      throw createAppError('User account not found.', 404);
+    }
+
+    return sanitizeUser(user);
+  }
+
   const user = await User.findById(userId);
 
   if (!user || !user.isActive) {

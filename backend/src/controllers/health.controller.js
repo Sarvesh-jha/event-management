@@ -1,15 +1,16 @@
-const mongoose = require('mongoose');
-
 const env = require('../config/env');
+const { getDatabaseState } = require('../config/database');
 
 const getHealthStatus = (req, res) => {
-  const isDatabaseConnected = mongoose.connection.readyState === 1;
+  const databaseState = getDatabaseState();
 
   res.status(200).json({
     success: true,
-    message: 'API and database look healthy.',
+    message: 'API and storage look healthy.',
     environment: env.nodeEnv,
-    database: isDatabaseConnected ? 'connected' : 'disconnected',
+    database: databaseState.connected ? 'connected' : 'disconnected',
+    storageMode: databaseState.mode,
+    storageMessage: databaseState.message,
     timestamp: new Date().toISOString(),
   });
 };

@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 
 import { API_BASE_URL } from '../config/api.config';
 import { AuthSession, LoginPayload, RegisterPayload } from '../models/auth.model';
@@ -21,9 +21,19 @@ export class AuthService {
   private readonly previewSignal = signal(this.readStoredPreviewFlag());
 
   readonly currentUser = computed(() => this.userSignal());
-  readonly isAuthenticated = computed(() => Boolean(this.tokenSignal()));
-  readonly isAdmin = computed(() => this.userSignal()?.role === 'admin');
+  readonly isAuthenticated = computed(
+    () => Boolean(this.tokenSignal()) && !this.previewSignal(),
+  );
+  readonly isAdmin = computed(
+    () => this.isAuthenticated() && this.userSignal()?.role === 'admin',
+  );
   readonly isPreviewMode = computed(() => this.previewSignal());
+
+  constructor() {
+    if (this.previewSignal()) {
+      this.clearSessionState();
+    }
+  }
 
   login(payload: LoginPayload): Observable<AuthSession> {
     return this.http.post<unknown>(`${API_BASE_URL}/auth/login`, payload).pipe(
@@ -31,7 +41,7 @@ export class AuthService {
         this.normalizeAuthSession(response, payload.email, payload.email.split('@')[0]),
       ),
       tap((session) => this.persistSession(session, false)),
-      catchError((error: HttpErrorResponse) =>
+      catchError((error: unknown) =>
         this.handleAuthFailure(error, payload.email, payload.email.split('@')[0]),
       ),
     );
@@ -41,39 +51,40 @@ export class AuthService {
     return this.http.post<unknown>(`${API_BASE_URL}/auth/register`, payload).pipe(
       map((response) => this.normalizeAuthSession(response, payload.email, payload.fullName)),
       tap((session) => this.persistSession(session, false)),
-      catchError((error: HttpErrorResponse) =>
+      catchError((error: unknown) =>
         this.handleAuthFailure(error, payload.email, payload.fullName, payload.department),
       ),
     );
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenStorageKey);
-    localStorage.removeItem(this.userStorageKey);
-    localStorage.removeItem(this.previewStorageKey);
-
-    this.tokenSignal.set(null);
-    this.userSignal.set(null);
-    this.previewSignal.set(false);
-
+    this.clearSessionState();
     this.router.navigateByUrl('/events');
   }
 
   getToken(): string | null {
-    return this.tokenSignal();
+    return this.previewSignal() ? null : this.tokenSignal();
   }
 
   private handleAuthFailure(
-    error: HttpErrorResponse,
+    error: unknown,
     email: string,
     fullName: string,
     department = 'Student Affairs',
   ): Observable<AuthSession> {
-    if (this.shouldUsePreviewMode(error)) {
-      // Keep the app usable during frontend work even if the auth API is temporarily down.
-      const previewSession = this.createPreviewSession(email, fullName, department);
-      this.persistSession(previewSession, true);
-      return of(previewSession);
+    void email;
+    void fullName;
+    void department;
+
+    if (error instanceof HttpErrorResponse && this.isServiceUnavailable(error)) {
+      this.clearSessionState();
+
+      return throwError(
+        () =>
+          new Error(
+            'Authentication service is unavailable. Make sure the backend server is running on port 5001.',
+          ),
+      );
     }
 
     return throwError(
@@ -107,37 +118,21 @@ export class AuthService {
       role: this.resolveRole(this.readString(userRecord['role']), fallbackEmail),
     };
 
+    const token =
+      this.readString(responseRecord['token']) ??
+      this.readString(dataRecord['token']);
+
+    if (!token) {
+      throw new Error('Authentication response did not include a token.');
+    }
+
     return {
-      token:
-        this.readString(responseRecord['token']) ??
-        this.readString(dataRecord['token']) ??
-        `session-${Date.now()}`,
+      token,
       user,
       previewMode: false,
       message:
         this.readString(responseRecord['message']) ??
         this.readString(dataRecord['message']),
-    };
-  }
-
-  private createPreviewSession(
-    email: string,
-    fullName: string,
-    department = 'Student Affairs',
-  ): AuthSession {
-    const role = this.resolveRole(undefined, email);
-
-    return {
-      token: `preview-${role}-${Date.now()}`,
-      user: {
-        id: this.createId(),
-        fullName,
-        email,
-        department,
-        role,
-      },
-      previewMode: true,
-      message: 'Sample sign-in mode is on because the auth API could not be reached.',
     };
   }
 
@@ -151,19 +146,27 @@ export class AuthService {
     this.previewSignal.set(previewMode);
   }
 
-  private shouldUsePreviewMode(error: HttpErrorResponse): boolean {
+  private isServiceUnavailable(error: HttpErrorResponse): boolean {
     return [0, 404, 500, 502, 503].includes(error.status);
   }
 
-  private extractErrorMessage(error: HttpErrorResponse, fallback: string): string {
-    const errorRecord = this.asRecord(error.error);
+  private extractErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof HttpErrorResponse) {
+      const errorRecord = this.asRecord(error.error);
 
-    return (
-      this.readString(errorRecord['message']) ??
-      this.readString(errorRecord['error']) ??
-      error.message ??
-      fallback
-    );
+      return (
+        this.readString(errorRecord['message']) ??
+        this.readString(errorRecord['error']) ??
+        error.message ??
+        fallback
+      );
+    }
+
+    if (error instanceof Error) {
+      return error.message || fallback;
+    }
+
+    return fallback;
   }
 
   private readStoredToken(): string | null {
@@ -206,5 +209,15 @@ export class AuthService {
 
   private createId(): string {
     return `user-${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  private clearSessionState(): void {
+    localStorage.removeItem(this.tokenStorageKey);
+    localStorage.removeItem(this.userStorageKey);
+    localStorage.removeItem(this.previewStorageKey);
+
+    this.tokenSignal.set(null);
+    this.userSignal.set(null);
+    this.previewSignal.set(false);
   }
 }

@@ -38,6 +38,9 @@ export class RegisterPageComponent {
 
   protected submit(): void {
     if (this.form.invalid) {
+      this.errorMessage.set(
+        'Fill all required fields and use a password with at least 8 characters.',
+      );
       this.form.markAllAsTouched();
       return;
     }

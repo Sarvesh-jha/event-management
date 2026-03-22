@@ -1,6 +1,7 @@
 backend/node_modules
 frontend/node_modules
 backend/.env
+backend/data/local-data.json
 frontend/.angular
 frontend/dist
 coverage

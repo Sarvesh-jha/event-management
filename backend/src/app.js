@@ -9,10 +9,30 @@ const notFoundHandler = require('./middlewares/not-found.middleware');
 const errorHandler = require('./middlewares/error.middleware');
 
 const app = express();
+const allowedOrigins = new Set([env.clientUrl]);
+
+try {
+  const configuredClientUrl = new URL(env.clientUrl);
+  const port = configuredClientUrl.port ? `:${configuredClientUrl.port}` : '';
+
+  if (['localhost', '127.0.0.1'].includes(configuredClientUrl.hostname)) {
+    allowedOrigins.add(`${configuredClientUrl.protocol}//localhost${port}`);
+    allowedOrigins.add(`${configuredClientUrl.protocol}//127.0.0.1${port}`);
+  }
+} catch (error) {
+  console.warn(`Invalid CLIENT_URL configured for CORS: ${env.clientUrl}`);
+}
 
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin ${origin} is not allowed by CORS.`));
+    },
     credentials: true,
   }),
 );

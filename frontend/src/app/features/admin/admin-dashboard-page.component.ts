@@ -94,6 +94,9 @@ export class AdminDashboardPageComponent implements OnInit {
 
   protected submitEvent(): void {
     if (this.form.invalid) {
+      this.errorMessage.set(
+        'Fill all required event fields before saving, including start date and end date.',
+      );
       this.form.markAllAsTouched();
       return;
     }
@@ -103,6 +106,13 @@ export class AdminDashboardPageComponent implements OnInit {
     this.successMessage.set('');
 
     const formValue = this.form.getRawValue();
+
+    if (new Date(formValue.endDate) <= new Date(formValue.startDate)) {
+      this.errorMessage.set('End date must be after the start date.');
+      this.isSubmitting.set(false);
+      return;
+    }
+
     const payload: EventFormPayload = {
       ...formValue,
       capacity: Number(formValue.capacity),
@@ -136,6 +146,8 @@ export class AdminDashboardPageComponent implements OnInit {
   }
 
   protected editEvent(event: CampusEvent): void {
+    this.errorMessage.set('');
+    this.successMessage.set('');
     this.editingEventId.set(event.id);
     this.form.patchValue({
       title: event.title,
@@ -263,6 +275,7 @@ export class AdminDashboardPageComponent implements OnInit {
 
   private resetForm(): void {
     this.editingEventId.set('');
+    this.errorMessage.set('');
     this.form.reset({
       title: '',
       shortDescription: '',

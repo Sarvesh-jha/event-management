@@ -1,12 +1,28 @@
 const mongoose = require('mongoose');
 
 const connectDatabase = require('../config/database');
+const { isUsingLocalDatabase } = require('../config/database');
 const env = require('../config/env');
+const localStore = require('../data/local-store');
 const User = require('../models/user.model');
 
 const seedAdmin = async () => {
   try {
     await connectDatabase();
+
+    if (isUsingLocalDatabase()) {
+      const existingAdmin = await localStore.findUserByEmail(
+        env.adminSeedEmail.toLowerCase(),
+        { includePassword: true },
+      );
+
+      await localStore.ensureAdminUser({ resetPassword: true });
+
+      console.log(
+        `${existingAdmin ? 'Admin user updated' : 'Admin user created'}: ${env.adminSeedEmail.toLowerCase()}`,
+      );
+      return;
+    }
 
     const existingAdmin = await User.findOne({
       email: env.adminSeedEmail.toLowerCase(),
@@ -42,7 +58,9 @@ const seedAdmin = async () => {
     console.error('Unable to seed admin user:', error.message);
     process.exitCode = 1;
   } finally {
-    await mongoose.connection.close();
+    if (!isUsingLocalDatabase()) {
+      await mongoose.connection.close();
+    }
   }
 };
 

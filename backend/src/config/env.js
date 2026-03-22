@@ -1,9 +1,11 @@
+const path = require('path');
+
 const dotenv = require('dotenv');
 
 dotenv.config();
 
 const env = {
-  port: Number(process.env.PORT) || 5000,
+  port: Number(process.env.PORT) || 5001,
   nodeEnv: process.env.NODE_ENV || 'development',
   mongodbUri:
     process.env.MONGODB_URI ||
@@ -22,6 +24,10 @@ const env = {
   smtpPass: process.env.SMTP_PASS || '',
   fromEmail: process.env.FROM_EMAIL || 'no-reply@smartcampus.local',
   enableReminderJob: process.env.ENABLE_REMINDER_JOB !== 'false',
+  enableLocalDbFallback: process.env.ENABLE_LOCAL_DB_FALLBACK !== 'false',
+  localDataFile:
+    process.env.LOCAL_DATA_FILE ||
+    path.join(__dirname, '..', '..', 'data', 'local-data.json'),
 };
 
 module.exports = env;
